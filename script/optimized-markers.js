@@ -6,9 +6,18 @@ function createOptimizedMarkers() {
     // Fonction pour obtenir une icône du cache ou en créer une nouvelle
     function getIcon(category) {
         const iconName = normalizeString(category);
+        
+        // Cas spéciaux pour certaines icônes SVG
+        let iconUrl = `image/${iconName}.png`;
+        if (iconName === 'apiculteur') {
+            iconUrl = `image/apiculteur_V3.svg`;
+        } else if (iconName === 'forets_et_parcs') {
+            iconUrl = `image/arbre_V01.svg`;
+        }
+        
         if (!iconCache[iconName]) {
             iconCache[iconName] = L.icon({
-                iconUrl: `image/${iconName}.png`,
+                iconUrl: iconUrl,
                 iconSize: [25, 25],
                 iconAnchor: [12, 12],
                 popupAnchor: [15, 0]
@@ -48,11 +57,23 @@ function createOptimizedMarkers() {
                 const iconElement = this.getElement();
                 if (iconElement) {
                     iconElement.classList.add('marker-active');
+                    
+                    // Cas spécial pour forêts et parcs : changer l'icône en rouge
+                    if (this.poiData.sous_cat === 'Forêts et Parcs') {
+                        this.setIcon(L.icon({
+                            iconUrl: `image/arbre_V01_rouge.svg`,
+                            iconSize: [25, 25],
+                            iconAnchor: [12, 12],
+                            popupAnchor: [15, 0]
+                        }));
+                    }
                 }
                 
                 // Supprimer l'effet des autres marqueurs
                 document.querySelectorAll('.marker-active').forEach(el => {
-                    if (el !== iconElement) el.classList.remove('marker-active');
+                    if (el !== iconElement) {
+                        el.classList.remove('marker-active');
+                    }
                 });
                 
                 // Afficher dans le volet droit
